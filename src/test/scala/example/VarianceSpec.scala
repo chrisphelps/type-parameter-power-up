@@ -10,9 +10,11 @@ class VarianceSpec extends FlatSpec with Matchers {
     def unwrapped: A = wrapped
   }
 
+  class SubWrapper[A](wrapped: A) extends Wrapper(wrapped) {}
+
   it should "admit the defined type" in {
     def doIt(catWrapper: Wrapper[Cat]) = {
-      print(s"Wrapped cat: ${catWrapper.unwrapped.name}")
+      println(s"Wrapped cat: ${catWrapper.unwrapped.name}")
     }
 
     doIt(new Wrapper(Cat("Garfield")))
@@ -21,7 +23,7 @@ class VarianceSpec extends FlatSpec with Matchers {
 // Won't compile: "class Wrapper is invariant in type A"
 //  it should "reject subtypes" in {
 //    def doIt(animalWrapper: Wrapper[Animal]) = {
-//      print(s"Wrapped animal: ${animalWrapper.unwrapped.name}")
+//      println(s"Wrapped animal: ${animalWrapper.unwrapped.name}")
 //    }
 //
 //    doIt(new Wrapper[Cat](Cat("Bill")))
@@ -29,7 +31,7 @@ class VarianceSpec extends FlatSpec with Matchers {
 
   it should "infer the superclass" in {
     def doIt(animalWrapper: Wrapper[Animal]) = {
-      print(s"Wrapped animal: ${animalWrapper.unwrapped.name}")
+      println(s"Wrapped animal: ${animalWrapper.unwrapped.name}")
     }
 
     // infers as Wrapper[Animal]. Will still dynamic dispatch but cannot call Cat methods.
@@ -37,4 +39,11 @@ class VarianceSpec extends FlatSpec with Matchers {
     doIt(new Wrapper(Cat("Bill")))
   }
 
+  it should "allow subclasses of the container" in {
+    def doIt(animalWrapper: Wrapper[Cat]) = {
+      println(s"Wrapped animal: ${animalWrapper.unwrapped.name}")
+    }
+
+    doIt(new SubWrapper(Cat("Milo")))
+  }
 }
